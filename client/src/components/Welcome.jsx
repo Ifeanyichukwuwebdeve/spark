@@ -1,8 +1,10 @@
-
+import React, { useContext } from 'react';
 import { AiFillPlayCircle } from 'react-icons/ai'
 import { SiEthereum } from 'react-icons/si'
 import { BsInfoCircle } from 'react-icons/bs'
 
+import { TransactionContext } from '../context/TransactionContext'
+import { shortenAddress } from '../utils/shortAddress';
 import { Loader } from './'
 
 const companyCommonStyles = "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white"
@@ -19,22 +21,16 @@ const Input = ({ placeholder, name, type, value, handleChange }) => (
 );
 
 const Welcome = () => {
-
-  const connectWallet = () => {
-    console.log('fired')
-  }
-  const handleChange = () => {
-    console.log('fired')
-  }
+  const { connectWallet, currentAccount, formData, setformData, handleChange, sendTransaction } = useContext(TransactionContext)
 
   const handleSubmit = (e) => {
-    // const { addressTo, amount, keyword, message } = formData;
+    const { addressTo, amount, keyword, message } = formData
 
     e.preventDefault();
 
-    // if (!addressTo || !amount || !keyword || !message) return;
+    if (!addressTo || !amount || !keyword || !message) return
 
-    // sendTransaction();
+    sendTransaction();
   };
 
   return(
@@ -43,9 +39,11 @@ const Welcome = () => {
         <div className='flex flex-1 justify-start flex-col mf:mr-10'>
             <h1 className='text-3xl sm:text-5xl text-white text-gradient py-1'>Send Crypto <br /> across the world</h1>
             <p className='text-left mt-5 text-white font-light md:w9/12 w-11/12 text-base'>Explore the crypto world. Buy and sell cryptocurrencies easily on Krypto.</p>
-            <button type='button' onClick={connectWallet} className='flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd] text-white text-semibold'>
+            {!currentAccount && (
+              <button type='button' onClick={connectWallet} className='flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd] text-white text-semibold'>
               Connect Wallet
-            </button>
+              </button>)
+            }
 
             <div className='grid sm:grid-cols-3 grid-cols-2 w-full mt-10'>
               <div className={`rounded-tl-2xl ${companyCommonStyles}`}>Reliability</div>
@@ -67,7 +65,7 @@ const Welcome = () => {
                   <BsInfoCircle fontSize={17} color='#fff' />
               </div>
               <div>
-                <p className='text-white font-light text-sm'>Address</p>
+                <p className='text-white font-light text-sm'>{ shortenAddress(currentAccount) }</p>
                 <p className='text-white font-semibold text-lg'>Ethereum</p>
               </div>
             </div>
