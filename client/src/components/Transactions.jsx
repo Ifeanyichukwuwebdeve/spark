@@ -2,8 +2,12 @@ import React, { useContext } from 'react'
 
 import { TransactionContext } from '../context/TransactionContext';
 import { shortenAddress } from '../utils/shortAddress';
+import useFetch from '../hooks/usefetch';
 
-const TransactionsCard = ({ addressTo, addressFrom, timeStamp, message, keyword, amount, url }) => {
+const TransactionsCard = ({ addressTo, addressFrom, timestamp, message, keyword, amount, url }) => {
+
+  const gifUrl = useFetch({ keyword })
+
   return (
     <div className='bg-[#181918] m-4 flex flex-1
     2xl:min-w-[450px]
@@ -23,22 +27,28 @@ const TransactionsCard = ({ addressTo, addressFrom, timeStamp, message, keyword,
           <p className='text-white text-base'>Amount: {amount} ETH</p>
           <p className='text-white text-base'>Message: {message}</p>
 
-          <div className='bg-black p-3 px-5 w-max rounded-3xl -mt-5 shadow-2xl'>
-            <p className='text-[#37c7da] font-bold'>{timeStamp}</p>
-          </div>
         </div>
+          <img
+            src={gifUrl}
+            alt="gif"
+            className='w-full h-64 2xl:h-96 rounded-md shadow-lg object-cover'
+          />
+
+          <div className='bg-black p-3 px-5 w-max rounded-3xl -mt-5 shadow-2xl'>
+            <p className='text-[#37c7da] font-bold'>{timestamp}</p>
+          </div>
       </div>
     </div>
   )
 }
 
 const Transactions = () => {
-  const { currentAccount } = useContext(TransactionContext)
+  const { currentAccount, transactions } = useContext(TransactionContext)
   const dummyContent = [
     {
       addressTo: '0x02dsd',
       addressFrom: '0xw434324fsdgtydrr453r',
-      timeStamp: 432,
+      timestamp: 432,
       message: 'Tst',
       keyword: 'Test',
       amount: 20,
@@ -47,7 +57,7 @@ const Transactions = () => {
     {
       addressTo: '0x02dsd',
       addressFrom: '0xw434324fsdgtydrr453r',
-      timeStamp: 432,
+      timestamp: 432,
       message: 'Tst',
       keyword: 'Test',
       amount: 20,
@@ -56,7 +66,7 @@ const Transactions = () => {
     {
       addressTo: '0x02dsd',
       addressFrom: '0xw434324fsdgtydrr453r',
-      timeStamp: 432,
+      timestamp: 432,
       message: 'Tst',
       keyword: 'Test',
       amount: 20,
@@ -65,7 +75,7 @@ const Transactions = () => {
     {
       addressTo: '0x02dsd',
       addressFrom: '0xw434324fsdgtydrr453r',
-      timeStamp: 432,
+      timestamp: 432,
       message: 'Tst',
       keyword: 'Test',
       amount: 20,
@@ -74,7 +84,7 @@ const Transactions = () => {
     {
       addressTo: '0x02dsd',
       addressFrom: '0xw434324fsdgtydrr453r',
-      timeStamp: 432,
+      timestamp: 432,
       message: 'Tst',
       keyword: 'Test',
       amount: 20,
@@ -83,7 +93,7 @@ const Transactions = () => {
     {
       addressTo: '0x02dsd',
       addressFrom: '0xw434324fsdgtydrr453r',
-      timeStamp: 432,
+      timestamp: 432,
       message: 'Tst',
       keyword: 'Test',
       amount: 20,
@@ -100,7 +110,7 @@ const Transactions = () => {
           <h3 className='text-white text-3xl text-center my-2'>Connect your account to see latest transactions</h3>
         )}
         <div className='flex flex-wrap justify-center items-center mt-10'>
-          {dummyContent.reverse().map((transaction, i) => (
+          {transactions.reverse().map((transaction, i) => (
             <TransactionsCard key={i} {...transaction}/>
           ))}
         </div>

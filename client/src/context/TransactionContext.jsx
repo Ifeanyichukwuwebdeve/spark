@@ -26,6 +26,28 @@ export const TransactionProvider = ({ children }) => {
     setformData((prevState) => ({ ...prevState, [name]: e.target.value }));
   }
 
+  const getAllTransactions = async () => {
+    try {
+      if(!ethereum) return alert('Please install metaMask')
+
+      const transactionContract = getEthereumContract()
+      const availableTransactions = await transactionContract.getAllTransaction()
+
+      const structuredTransactions = availableTransactions.map(tx => ({
+        addressTo: tx.receiver,
+        addressFrom: tx.sender,
+        timestamp: new Date(tx.timestamp.toNumber() * 1000).toLocaleString(),
+        message: tx.message,
+        keyword: tx.keyword,
+        amount: parseInt(tx.amount._hex) / (10 ** 18)
+      }))
+      setTransactions(structuredTransactions)
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+
   const checkIfWalletIsConnected = async () => {
     try {
 
@@ -35,11 +57,23 @@ export const TransactionProvider = ({ children }) => {
 
       if(accounts.length) {
         setCurrentAccount(accounts[0])
+        getAllTransactions()
       } else {
         console.log('No accounts found')
       }
 
       // console.log(accounts[0])
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+
+  const getTransactionsCount = async () => {
+    try {
+      const transactionContract = getEthereumContract()
+      const transactionsCount = await transactionContract.getTransactionCount();
+      window.localStorage.setItem("transactionCount", transactionsCount);
     } catch (error) {
       console.log(error)
       throw error
@@ -87,10 +121,10 @@ export const TransactionProvider = ({ children }) => {
       console.log(`Successful - ${transactionHash.hash}`)
       console.log('Fired')
 
-      const transactionsCount = await transactionsContract.getTransactionCount();
+      const transactionsCount = await transactionContract.getTransactionCount();
       
       setTransactionCount(transactionsCount.toNumber());
-      
+      getAllTransactions()
     } catch (error) {
       console.log(error)
       throw error
@@ -98,11 +132,12 @@ export const TransactionProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    checkIfWalletIsConnected()
+    checkIfWalletIsConnected(),
+    getTransactionsCount()
   }, [])
   
   return (
-    <TransactionContext.Provider value={{ connectWallet, currentAccount, formData, setformData, handleChange, sendTransaction }}>
+    <TransactionContext.Provider value={{ connectWallet, currentAccount, formData, setformData, handleChange, sendTransaction, transactions, isLoading }}>
       {children}
     </TransactionContext.Provider>
   )
